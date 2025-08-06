@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check-in Festa 4 Settembre</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    h1 { text-align: center; }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th { background-color: #f0f0f0; }
+    tr.present { background-color: #d4edda; }
+    .present-btn {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: white;
+    }
+    .present-btn:disabled {
+      background-color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>Check-in Festa 4 Settembre</h1>
+  <input type="text" id="searchInput" placeholder="Cerca per nome, cognome o numero..." onkeyup="searchGuest()">
+
+  <table id="guestTable">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Cognome</th>
+        <th>Numero</th>
+        <th>Presente</th>
+      </tr>
+    </thead>
+    <tbody id="guestList">
+      <!-- Lista esempio, puoi sostituirla con i veri partecipanti -->
+      <tr>
+        <td>Marco</td>
+        <td>Rossi</td>
+        <td>3331234567</td>
+        <td><button class="present-btn" onclick="markPresent(this)">✔</button></td>
+      </tr>
+      <tr>
+        <td>Giulia</td>
+        <td>Bianchi</td>
+        <td>3289876543</td>
+        <td><button class="present-btn" onclick="markPresent(this)">✔</button></td>
+      </tr>
+      <!-- Aggiungi qui gli altri ospiti -->
+    </tbody>
+  </table>
+
+  <script>
+    function searchGuest() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#guestTable tbody tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+      });
+    }
+
+    function markPresent(button) {
+      const row = button.parentElement.parentElement;
+      row.classList.add("present");
+      button.disabled = true;
+    }
+  </script>
+</body>
+</html>
