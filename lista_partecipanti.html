@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check-in Festa 4 Settembre</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    h1 { text-align: center; }
+    input[type="text"], input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button.delete {
+        background-color: #dc3545;
+    }
+    button.edit {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    button.save {
+        background-color: #28a745;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th { background-color: #f0f0f0; }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+    .switch input { display: none; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #28a745;
+    }
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+    .switch-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    tr.present {
+      background-color: #d4edda;
+    }
+  </style>
+</head>
+<body>
+  <h1>Check-in Festa 4 Settembre</h1>
+
+  <input type="text" id="searchInput" placeholder="Cerca per nome, cognome o numero..." onkeyup="searchGuest()">
+
+  <h2>Aggiungi Partecipante</h2>
+  <input type="text" id="newNome" placeholder="Nome">
+  <input type="text" id="newCognome" placeholder="Cognome">
+  <input type="tel" id="newNumero" placeholder="Numero">
+  <button onclick="aggiungiPartecipante()">Aggiungi</button>
+
+  <table id="guestTable">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Cognome</th>
+        <th>Numero</th>
+        <th>Presenza</th>
+        <th>Azioni</th>
+      </tr>
+    </thead>
+    <tbody id="guestList">
+    </tbody>
+  </table>
+
+  <script>
+    function searchGuest() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#guestTable tbody tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+      });
+    }
+
+    function aggiungiPartecipante() {
+      const nome = document.getElementById("newNome").value;
+      const cognome = document.getElementById("newCognome").value;
+      const numero = document.getElementById("newNumero").value;
+      if (!nome || !cognome || !numero) return alert("Inserisci tutti i campi.");
+
+      const table = document.getElementById("guestList");
+      const row = table.insertRow();
+
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+      const cell3 = row.insertCell(2);
+      const cell4 = row.insertCell(3);
+      const cell5 = row.insertCell(4);
+
+      cell1.textContent = nome;
+      cell2.textContent = cognome;
+      cell3.textContent = numero;
+      cell4.innerHTML = `
+        <label class="switch-label">
+          ❌
+          <label class="switch">
+            <input type="checkbox" onchange="togglePresenza(this)">
+            <span class="slider"></span>
+          </label>
+          ✅
+        </label>
+      `;
+      cell5.innerHTML = `
+        <button class="edit" onclick="modificaPartecipante(this)">Modifica</button>
+        <button class="delete" onclick="eliminaPartecipante(this)">Elimina</button>
+      `;
+
+      document.getElementById("newNome").value = "";
+      document.getElementById("newCognome").value = "";
+      document.getElementById("newNumero").value = "";
+    }
+
+    function togglePresenza(checkbox) {
+      const row = checkbox.closest("tr");
+      if (checkbox.checked) {
+        row.classList.add("present");
+      } else {
+        row.classList.remove("present");
+      }
+    }
+
+    function eliminaPartecipante(button) {
+      const row = button.closest("tr");
+      row.remove();
+    }
+
+    function modificaPartecipante(button) {
+      const row = button.closest("tr");
+      const cells = row.querySelectorAll("td:not(:last-child)");
+
+      const nome = cells[0].textContent;
+      const cognome = cells[1].textContent;
+      const numero = cells[2].textContent;
+
+      cells[0].innerHTML = `<input type="text" value="${nome}">`;
+      cells[1].innerHTML = `<input type="text" value="${cognome}">`;
+      cells[2].innerHTML = `<input type="tel" value="${numero}">`;
+
+      button.textContent = "Salva";
+      button.className = "save";
+      button.setAttribute("onclick", "salvaModifiche(this)");
+    }
+
+    function salvaModifiche(button) {
+      const row = button.closest("tr");
+      const cells = row.querySelectorAll("td:not(:last-child)");
+
+      const nome = cells[0].querySelector("input").value;
+      const cognome = cells[1].querySelector("input").value;
+      const numero = cells[2].querySelector("input").value;
+
+      cells[0].textContent = nome;
+      cells[1].textContent = cognome;
+      cells[2].textContent = numero;
+
+      button.textContent = "Modifica";
+      button.className = "edit";
+      button.setAttribute("onclick", "modificaPartecipante(this)");
+    }
+  </script>
+</body>
+</html>
